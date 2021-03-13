@@ -97,9 +97,10 @@ class RobotPost(object):
     nPages = 0           # Count the number of pages
     PROG_NAMES_MAIN = [] # List of programs called by a main program due to splitting
 
-    PROG = []     # Save the program lines
+    #PROG = []     # Save the program lines
     PROG_TARGETS = []  # Save the program lines (targets section)
     LOG = '' # Save a log
+    header = ''
 
     nAxes = 6 # Important: This is usually provided by RoboDK automatically. Otherwise, override the __init__ procedure.
     AXES_TYPE = ['R','R','R','R','R','R']  # Important: This is usually set up by RoboDK automatically. Otherwise, override the __init__ procedure.
@@ -128,6 +129,7 @@ class RobotPost(object):
 
         self.PROG = []
         self.PROG_TARGETS = []
+        #self.header = ''
         #for k,v in kwargs.iteritems(): # python2
         for k,v in kwargs.items():
             if k == 'lines_x_prog':
@@ -198,17 +200,14 @@ class RobotPost(object):
         header = header + '      BUSY_LAMP_OFF\t= 0,' + '\n'
         header = header + '      ABORT_REQUEST\t= 0,' + '\n'
         header = header + '      PAUSE_REQUEST\t= 0;' + '\n'
-        #header = header + 'DEFAULT_GROUP\t= 1,*,*,*,*;' + '\n'  #old controllers
-        header = header + 'DEFAULT_GROUP\t= 1,*,*,*,*,*,*;' + '\n'
+        header = header + 'DEFAULT_GROUP\t= 1,*,*,*,*;' + '\n'  #old controllers
         header = header + 'CONTROL_CODE\t= 00000000 00000000;' + '\n'
-        if self.HAS_TURNTABLE:
-            header = header + '/APPL' + '\n'
-            header = header + '' + '\n'
-            header = header + 'LINE_TRACK;' + '\n'
-            header = header + 'LINE_TRACK_SCHEDULE_NUMBER      : 0;' + '\n'
-            header = header + 'LINE_TRACK_BOUNDARY_NUMBER      : 0;' + '\n'
-            header = header + 'CONTINUE_TRACK_AT_PROG_END      : FALSE;' + '\n'
-            header = header + '' + '\n'
+
+        header = header + '/APPL' + '\n' + '\n'
+
+        header = header +  'AUTO_SINGULARITY_HEADER;' + '\n'
+        header = header +  '  ENABLE_SINGULARITY_AVOIDANCE   : TRUE;' + '\n'
+
         header = header + '/MN'
         #header = header + '/MN' + '\n'    # Important! Last line should not have \n
 
@@ -221,7 +220,6 @@ class RobotPost(object):
         self.PROG_LIST.append(self.PROG)
         self.PROG = []
         self.PROG_TARGETS = []
-        #self.nLines = 0
         self.LINE_COUNT = 0
         self.P_COUNT = 0
         self.LBL_ID_COUNT = 0
